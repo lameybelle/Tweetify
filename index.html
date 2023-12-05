@@ -147,7 +147,7 @@
         });
 
         // Copy all tweets to the clipboard
-        navigator.clipboard.writeText(allTweets);
+        window.navigator.clipboard.writeText(allTweets);
     }
 
     function copyTweet (tweet) {
@@ -159,7 +159,7 @@
             copiedTweet += paragraph + '\n';
         });
 
-        navigator.clipboard.writeText(copiedTweet);
+        window.navigator.clipboard.writeText(copiedTweet);
     }
     </script>
 </body>

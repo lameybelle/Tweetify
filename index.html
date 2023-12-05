@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tweet Breaker</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Basic styling for demonstration purposes */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    #container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    textarea {
+        width: 100%;
+        height: 100px;
+    }
+    button {
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    #results {
+        margin-top: 20px;
+        border-top: 1px solid #ccc;
+        padding-top: 10px;
+    }
+    </style>
+
+</head>
+<body>
+    <div id="container">
+        <h1>Tweetify</h1>
+        <form id="inputForm">
+            <label for="textInput">Enter your text:</label><br>
+            <textarea id="textInput" name="text" placeholder="Type your text here..." required></textarea><br>
+            <p>Note: for best results please have a line of free space between paragraphs, or none at all.</p>
+            <button type="button" onclick="breakIntoTweets()">Break into Tweets</button>
+            <button type="button" onclick="copyAllText()">Copy All Tweets</button>
+        </form>
+        <div id="results"></div>
+    </div>
+
+    <script>
+    function breakIntoTweets() {
+        const fic = document.getElementById('textInput').value;
+        const paragraphs = fic.split(/\r\n|\r|\n/); // Split by double line breaks to maintain paragraphs
+        const tweets = [];
+        let currentTweet = "";
+        const newline = '^'
+
+        paragraphs.forEach(paragraph => {
+            const words = paragraph.split(/\s+/); // Split into words using regex to handle various whitespace characters
+
+            words.forEach(word => {
+                if (currentTweet.length + word.length + 1 <= 248) {
+                    if (currentTweet !== "") {
+                        currentTweet += " "; // Add space between words if not the first word in the tweet
+                    }
+                    currentTweet += word;
+                } else {
+                    tweets.push(currentTweet);
+                    currentTweet = word; // Start a new tweet
+                }
+            });
+
+            currentTweet += newline
+
+        });
+
+        if (currentTweet !== "") {
+            tweets.push(currentTweet);
+        }
+        alert(tweets[0])
+        displayResults(tweets);
+    }
+
+
+
+    function displayResults(tweets) {
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = ''; // Clear previous results
+        const tweetContainer = document.createElement('div')
+        tweets.forEach(function(tweet, index) {
+            //Create div and giving it a class with it's number
+            const tweetContainer = document.createElement('div');
+            tweetContainer.setAttribute('data-tweet-index', index);
+
+            // Create and append "Tweet #:" label
+            const tweetLabel = document.createElement('span');
+            tweetLabel.textContent = 'Tweet ' + (index + 1) + ': ';
+            tweetContainer.appendChild(tweetLabel);
+            
+            //paragraph break
+            const tweetBreak = document.createElement('br');
+
+            
+            //Split on the paragraph marker '^' used in the python script 
+            const paragraphs = tweet.split('^')
+            
+            //Iterate through each of the paragraphs in a given tweet
+            paragraphs.forEach(function(paragraph) {
+                // Create and append tweet text
+                const tweetText = document.createElement('p');
+                tweetText.textContent = paragraph;
+                tweetContainer.appendChild(tweetText);
+                
+                //break for paragraph
+                const tweetBreak = document.createElement('br');     
+            });
+
+            //button to copy text of this specific tweet
+            const buttonElement = document.createElement('button');
+            buttonElement.textContent = 'Copy tweet ' + (index+1);
+            buttonElement.addEventListener('click', function() {
+                // copy text when clicked
+                copyTweet(tweet);
+            });
+
+            tweetContainer.appendChild(buttonElement);
+
+            // Create and append horizontal line
+            const line = document.createElement('hr');
+            tweetContainer.appendChild(line);
+            
+            resultsDiv.appendChild(tweetContainer);
+        });
+    }
+
+    function copyAllText() {
+        const resultsDiv = document.getElementById('results');
+        const tweetElements = resultsDiv.querySelectorAll('div'); // Assuming each tweet is wrapped in a <div> element
+
+        let allTweets = '';
+        tweetElements.forEach((tweetElement) => {
+            const tweetParagraphs = tweetElement.querySelectorAll('p');
+            tweetParagraphs.forEach((paragraph) => {
+                allTweets += paragraph.textContent + '\n';
+            });
+            allTweets += '\n\n'; // Add an extra line break between tweets
+        });
+
+        // Copy all tweets to the clipboard
+        navigator.clipboard.writeText(allTweets);
+    }
+
+    function copyTweet (tweet) {
+        let copiedTweet = "";
+        const paragraphs = tweet.split('^');
+            
+        //Iterate through each of the paragraphs in a given tweet
+        paragraphs.forEach(function(paragraph) {
+            copiedTweet += paragraph + '\n';
+        });
+
+        navigator.clipboard.writeText(copiedTweet);
+    }
+    </script>
+</body>
+</html>

@@ -15,6 +15,7 @@
         margin: 0 auto;
     }
     textarea {
+        font-family: Arial, sans-serif;
         width: 100%;
         height: 100px;
     }
@@ -52,19 +53,20 @@
         const paragraphs = fic.split(/\r\n|\r|\n/); // Split by double line breaks to maintain paragraphs
         const tweets = [];
         let currentTweet = "";
-        const newline = '^'
+        const newline = '^';
+        prev = "";
 
         paragraphs.forEach(paragraph => {
             const words = paragraph.split(/\s+/); // Split into words using regex to handle various whitespace characters
 
             words.forEach(word => {
                 if (currentTweet.length + word.length + 1 <= 248) {
-                    if (currentTweet !== "") {
+                    if (currentTweet !== "" && prev !== "^") {
                         currentTweet += " "; // Add space between words if not the first word in the tweet
                     }
                     currentTweet += word;
                 } else {
-                    tweets.push(currentTweet);
+                    tweets.push(currentTweet + " +");
                     currentTweet = word; // Start a new tweet
                 }
             });
@@ -115,7 +117,7 @@
 
             //button to copy text of this specific tweet
             const buttonElement = document.createElement('button');
-            buttonElement.textContent = 'Copy tweet ' + (index+1);
+            buttonElement.textContent = 'Copy Tweet ' + (index+1);
             buttonElement.addEventListener('click', function() {
                 // copy text when clicked
                 copyTweet(tweet);
@@ -141,7 +143,7 @@
             tweetParagraphs.forEach((paragraph) => {
                 allTweets += paragraph.textContent + '\n';
             });
-            allTweets += '\n\n'; // Add an extra line break between tweets
+            allTweets += '\n\n\n'; // Add an extra line break between tweets
         });
 
         // Copy all tweets to the clipboard
